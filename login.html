@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CCST Portal - Login / Register</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background: #f4f6f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .card {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 420px;
+        }
+        h2 { text-align: center; color: #004080; margin-bottom: 25px; }
+        input, select, button {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        button {
+            background: #004080;
+            color: white;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        .toggle-link { text-align: center; margin-top: 15px; cursor: pointer; color: #004080; }
+        .error { color: red; text-align: center; margin: 10px 0; }
+        .success { color: green; text-align: center; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2 id="formTitle">Login to CCST Portal</h2>
+        
+        <div id="errorMsg" class="error"></div>
+        <div id="successMsg" class="success"></div>
+
+        <!-- Login Form -->
+        <div id="loginForm">
+            <input type="email" id="loginEmail" placeholder="Email Address" required>
+            <input type="password" id="loginPassword" placeholder="Password" required>
+            <button onclick="performLogin()">LOGIN</button>
+            <div class="toggle-link" onclick="switchToRegister()">Don't have an account? Register</div>
+        </div>
+
+        <!-- Register Form (hidden by default) -->
+        <div id="registerForm" style="display:none;">
+            <input type="text" id="regName" placeholder="Full Name">
+            <input type="email" id="regEmail" placeholder="Email Address" required>
+            <input type="password" id="regPassword" placeholder="Create Password" required>
+            <select id="regRole">
+                <option value="student">Student</option>
+                <option value="accountant">Accountant</option>
+                <option value="administrator">Administrator</option>
+            </select>
+            <button onclick="performRegister()">REGISTER</button>
+            <div class="toggle-link" onclick="switchToLogin()">Already have an account? Login</div>
+        </div>
+    </div>
+
+    <script>
+        let SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxe8RXV8emNhVjKpbLV374ZHMJh610lSzP8RhcH9akFezJSenkvyaRl2OzK1PFMsbtm/exec';
+
+        function init() {
+            google.script.run
+                .withSuccessHandler(url => { SCRIPT_URL = url; })
+                .getScriptUrl();
+        }
+
+        function switchToRegister() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+            document.getElementById('formTitle').innerText = 'Create New Account';
+            clearMessages();
+        }
+
+        function switchToLogin() {
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('formTitle').innerText = 'Login to CCST Portal';
+            clearMessages();
+        }
+
+        function clearMessages() {
+            document.getElementById('errorMsg').innerHTML = '';
+            document.getElementById('successMsg').innerHTML = '';
+        }
+
+        async function performLogin() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+            const errorEl = document.getElementById('errorMsg');
+
+            if (!email || !password) {
+                errorEl.textContent = "Email and password are required";
+                return;
+            }
+
+            try {
+                const result = await google.script.run
+                    .withSuccessHandler(r => r)
+                    .withFailureHandler(() => ({success: false, message: "Server error"}))
+                    .loginUser(email, password);
+
+                if (result.success) {
+                    let page = 'index';
+                    if (result.role === 'accountant') page = 'accountant';
+                    if (result.role === 'administrator') page = 'administrator';
+
+                    window.location.href = `${SCRIPT_URL}?page=${page}&loggedIn=true`;
+                } else {
+                    errorEl.textContent = result.message || "Invalid credentials";
+                }
+            } catch (e) {
+                errorEl.textContent = "Connection error. Please try again.";
+            }
+        }
+
+        async function performRegister() {
+            const name = document.getElementById('regName').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const password = document.getElementById('regPassword').value.trim();
+            const role = document.getElementById('regRole').value;
+            const errorEl = document.getElementById('errorMsg');
+            const successEl = document.getElementById('successMsg');
+
+            if (!email || !password) {
+                errorEl.textContent = "Email and password are required";
+                return;
+            }
+
+            if (password.length < 6) {
+                errorEl.textContent = "Password must be at least 6 characters";
+                return;
+            }
+
+            try {
+                const result = await google.script.run
+                    .withSuccessHandler(r => r)
+                    .withFailureHandler(() => ({success: false, message: "Server error"}))
+                    .registerUser(email, password, role, name);
+
+                if (result.success) {
+                    successEl.textContent = result.message;
+                    errorEl.textContent = '';
+                    // Auto switch to login after 1.5 seconds
+                    setTimeout(() => {
+                        switchToLogin();
+                        document.getElementById('loginEmail').value = email;
+                    }, 1500);
+                } else {
+                    errorEl.textContent = result.message;
+                }
+            } catch (e) {
+                errorEl.textContent = "Registration failed. Try again.";
+            }
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
