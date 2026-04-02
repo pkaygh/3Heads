@@ -5,68 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Dashboard | CCST</title>
     <style>
-        :root {
-            --primary: #004080;
-            --bg: #f4f6f9;
-            --success: #27ae60;
-            --danger: #e74c3c;
-            --sidebar-bg: #1e2a44;
-        }
+        :root { --primary: #004080; --bg: #f4f6f9; --success: #27ae60; --danger: #e74c3c; --sidebar-bg: #1e2a44; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: sans-serif;
-            background: var(--bg);
-            color: #333;
-            display: flex;
-            min-height: 100vh;
-        }
-        .sidebar {
-            width: 280px;
-            background: var(--sidebar-bg);
-            color: white;
-            padding: 20px 0;
-            position: fixed;
-            height: 100vh;
-            overflow-y: auto;
-        }
+        body { font-family: sans-serif; background: var(--bg); display: flex; min-height: 100vh; }
+        .sidebar { width: 280px; background: var(--sidebar-bg); color: white; padding: 20px 0; position: fixed; height: 100vh; overflow-y: auto; }
         .sidebar-header { padding: 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .sidebar-header h2 { font-size: 1.4rem; }
-        .menu-item {
-            padding: 14px 25px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: #ddd;
-            text-decoration: none;
-            transition: 0.3s;
-        }
+        .menu-item { padding: 14px 25px; display: flex; align-items: center; gap: 12px; color: #ddd; text-decoration: none; transition: 0.3s; }
         .menu-item:hover, .menu-item.active { background: rgba(255,255,255,0.1); color: white; }
         .main-content { margin-left: 280px; flex: 1; padding: 20px; }
-        .navbar {
-            background: var(--primary);
-            color: white;
-            padding: 15px 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-radius: 12px;
-            margin-bottom: 20px;
-        }
-        .card {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-            margin-bottom: 25px;
-        }
-        .profile-pic {
-            width: 120px; height: 120px; border-radius: 50%; object-fit: cover;
-            border: 4px solid white; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-        @media (max-width: 768px) {
-            .sidebar { width: 240px; }
-            .main-content { margin-left: 0; padding: 10px; }
-        }
+        .navbar { background: var(--primary); color: white; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; border-radius: 12px; margin-bottom: 20px; }
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin-bottom: 25px; }
+        .profile-pic { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid white; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
@@ -85,31 +35,25 @@
     <div class="main-content">
         <div class="navbar">
             <h3 id="pageTitle">Student Dashboard</h3>
-            <div><span id="studentName" style="margin-right:15px; font-weight:bold;"></span>
-                 <button onclick="logout()" style="background:#e74c3c; padding:8px 16px; border:none; color:white; border-radius:6px; cursor:pointer;">Logout</button>
-            </div>
+            <button onclick="logout()" style="background:#e74c3c; padding:8px 16px; border:none; color:white; border-radius:6px; cursor:pointer;">Logout</button>
         </div>
-
-        <!-- Sections (Profile, Courses, Finance, Notifications) remain the same as your original -->
-        <!-- For brevity, I kept the structure. You can paste your original section content here if needed. -->
 
         <div id="profileSection" class="section">
             <div class="card">
                 <h3 style="color:var(--primary);">My Profile</h3>
                 <div style="text-align:center;">
                     <img id="profilePic" src="https://via.placeholder.com/120" class="profile-pic">
-                    <h2 id="profileName"></h2>
-                    <p id="profileProgram"></p>
+                    <h2 id="profileName">Student Name</h2>
+                    <p id="profileProgram">Program | Level</p>
                 </div>
             </div>
         </div>
 
-        <!-- Add your other sections (coursesSection, financeSection, notificationsSection) from your original index.html here -->
-
+        <!-- Add your other sections (coursesSection, financeSection, notificationsSection) here if you want the full original content -->
     </div>
 
     <script>
-        let SCRIPT_URL = '';
+        let SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby577D_l-KQHTmZu4WBMwYvig-7RwK8qUGjA4GO1vudgpruv3jGtCtLl_3nkVPomIP1/exec';
 
         function initScriptUrl() {
             google.script.run
@@ -127,12 +71,13 @@
         }
 
         function logout() {
-            if (confirm("Logout?")) window.location.replace(SCRIPT_URL);
+            if (confirm("Are you sure you want to logout?")) {
+                window.location.replace(SCRIPT_URL);
+            }
         }
 
         window.onload = () => {
             initScriptUrl();
-            // Load your profile data here (you can expand with google.script.run.getStudentData etc.)
             showSection('profile');
         };
     </script>
